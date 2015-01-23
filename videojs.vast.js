@@ -26,7 +26,7 @@
 
             defaults = {
                 // seconds before skip button shows, negative values to disable skip button altogether
-                skip: 5
+                skip: undefined
             },
 
             Vast = function (player, settings) {
@@ -95,6 +95,7 @@
                                             if (creative.mediaFiles.length) {
 
                                                 player.vast.sources = player.vast.createSourceObjects(creative.mediaFiles);
+                                                player.vast.skip = creative.skipDelay || -1;
 
                                                 if (!player.vast.sources.length) {
                                                     player.trigger('adscanceled');
@@ -214,7 +215,7 @@
 
                         var skipButton = context.document.createElement("div");
                         skipButton.className = "vast-skip-button";
-                        if (settings.skip < 0) {
+                        if (settings.skip < 0 || player.vast.skip < 0) {
                             skipButton.style.display = "none";
                         }
                         player.vast.skipButton = skipButton;
@@ -263,7 +264,8 @@
 
                     timeupdate: function (e) {
                         player.loadingSpinner.el().style.display = "none";
-                        var timeLeft = Math.ceil(settings.skip - player.currentTime());
+                        var skipTime = settings.skip || player.vast.skip;
+                        var timeLeft = Math.ceil(skipTime - player.currentTime());
                         if (timeLeft > 0) {
                             player.vast.skipButton.innerHTML = "Skip in " + timeLeft + "...";
                         } else {
